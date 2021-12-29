@@ -1,11 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
+using XUnitDemo.Entities;
+using XUnitDemo.Helpers;
+using XUnitDemo.Services;
+using XUnitDemo.Test.Helper;
 using XUnitDemo.Test.Services;
 //using XUnitDemo.Controllers;
 //using XUnitDemo.Entities;
@@ -13,22 +20,40 @@ using XUnitDemo.Test.Services;
 
 namespace XUnitDemo.Test
 {
-    public class ShoppingCartControllerTest
+    public class ShoppingCartControllerTest : IClassFixture<CustomWebApplicationFactory<Startup>>
     {
         //  private readonly ShoppingCartController _controller;
         //  private readonly IShoppingCartService _service;
+       
         private readonly CustomWebApplicationFactory<Startup> _factory;
         public ShoppingCartControllerTest(CustomWebApplicationFactory<Startup> factory)
         {
             _factory = factory;
-           // _service = new Services.ShoppingCartServiceFake();
-           // _controller = new ShoppingCartController(_service);
-        }
+            // _service = new Services.ShoppingCartServiceFake();
+            // _controller = new ShoppingCartController(_service);
+          
+    }
 
         #region IntegrationTesting
 
 
+        [Fact]
+        public  async  Task GetUsersTestOk()
+        {
 
+
+            // Arrange
+            var user = new User { Id = 1 };
+            string data = UserToken.generateJwtToken(user);
+            var url = "api/ShoppingCart/getusers";
+            var client = _factory.CreateClient();
+            client.SetToken(JwtConstants.TokenType, data);
+            // Act
+            var response = await client.GetAsync(url);            
+
+            // Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
 
 
 
