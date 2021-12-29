@@ -1,3 +1,6 @@
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -11,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using XUnitDemo.Helpers;
 using XUnitDemo.Interfaces;
 using XUnitDemo.Services;
 
@@ -29,11 +33,19 @@ namespace XUnitDemo
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<IShoppingCartService, ShoppingCartService>();
+            services.AddCors();
             services.AddControllers();
+
+            // configure strongly typed settings object
+            services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
+
+            // configure DI for application services
+            services.AddScoped<IUserService, UserService>();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "XUnitDemo", Version = "v1" });
             });
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -46,12 +58,17 @@ namespace XUnitDemo
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "XUnitDemo v1"));
             }
 
-            app.UseHttpsRedirection();
-
+           
             app.UseRouting();
-
-            app.UseAuthorization();
-
+         
+            // global cors policy
+            app.UseCors(x => x
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
+            
+            // custom jwt auth middleware
+            app.UseMiddleware<JwtMiddleware>();           
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

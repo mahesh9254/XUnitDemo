@@ -1,185 +1,199 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Testing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
-using XUnitDemo.Controllers;
-using XUnitDemo.Entities;
-using XUnitDemo.Interfaces;
+using XUnitDemo.Test.Services;
+//using XUnitDemo.Controllers;
+//using XUnitDemo.Entities;
+//using XUnitDemo.Interfaces;
 
 namespace XUnitDemo.Test
 {
     public class ShoppingCartControllerTest
     {
-        private readonly ShoppingCartController _controller;
-        private readonly IShoppingCartService _service;
-
-        public ShoppingCartControllerTest()
+        //  private readonly ShoppingCartController _controller;
+        //  private readonly IShoppingCartService _service;
+        private readonly CustomWebApplicationFactory<Startup> _factory;
+        public ShoppingCartControllerTest(CustomWebApplicationFactory<Startup> factory)
         {
-            _service = new Services.ShoppingCartServiceFake();
-            _controller = new ShoppingCartController(_service);
-        }
-        #region Testing the Get Method
-        [Fact]
-        public void Get_WhenCalled_ReturnsOkResult()
-        {
-            // Act
-            var okResult = _controller.Get();
-
-            // Assert
-            Assert.IsType<OkObjectResult>(okResult as OkObjectResult);
+            _factory = factory;
+           // _service = new Services.ShoppingCartServiceFake();
+           // _controller = new ShoppingCartController(_service);
         }
 
-        [Fact]
-        public void Get_WhenCalled_ReturnsAllItems()
-        {
-            // Act
-            var okResult = _controller.Get() as OkObjectResult;
+        #region IntegrationTesting
 
-            // Assert
-            var items = Assert.IsType<List<ShoppingItem>>(okResult.Value);
-            Assert.Equal(3, items.Count);
-        }
+
+
+
+
+
         #endregion
 
-        #region Testing the GetById method
-        [Fact]
-        public void GetById_UnknownGuidPassed_ReturnsNotFoundResult()
-        {
-            // Act
-            var notFoundResult = _controller.Get(Guid.NewGuid());
+        // #region Testing the Get Method
+        //[Fact]
+        //public void Get_WhenCalled_ReturnsOkResult()
+        //{
+        //    //Arrange
+        //    var factory = new WebApiTesterFactory();
+        //    // Act
 
-            // Assert
-            Assert.IsType<NotFoundResult>(notFoundResult);
-        }
+        //    // Assert
+        //    Assert.IsType<OkObjectResult>(okResult as OkObjectResult);
+        //}
 
-        [Fact]
-        public void GetById_ExistingGuidPassed_ReturnsOkResult()
-        {
-            // Arrange
-            var testGuid = new Guid("ab2bd817-98cd-4cf3-a80a-53ea0cd9c200");
+        //[Fact]
+        //public void Get_WhenCalled_ReturnsAllItems()
+        //{
+        //    // Act
+        //    var okResult = _controller.Get() as OkObjectResult;
 
-            // Act
-            var okResult = _controller.Get(testGuid);
+        //    // Assert
+        //    var items = Assert.IsType<List<ShoppingItem>>(okResult.Value);
+        //    Assert.Equal(3, items.Count);
+        //}
+        //#endregion
 
-            // Assert
-            Assert.IsType<OkObjectResult>(okResult as OkObjectResult);
-        }
+        //#region Testing the GetById method
+        //[Fact]
+        //public void GetById_UnknownGuidPassed_ReturnsNotFoundResult()
+        //{
+        //    // Act
+        //    var notFoundResult = _controller.Get(Guid.NewGuid());
 
-        [Fact]
-        public void GetById_ExistingGuidPassed_ReturnsRightItem()
-        {
-            // Arrange
-            var testGuid = new Guid("ab2bd817-98cd-4cf3-a80a-53ea0cd9c200");
+        //    // Assert
+        //    Assert.IsType<NotFoundResult>(notFoundResult);
+        //}
 
-            // Act
-            var okResult = _controller.Get(testGuid) as OkObjectResult;
+        //[Fact]
+        //public void GetById_ExistingGuidPassed_ReturnsOkResult()
+        //{
+        //    // Arrange
+        //    var testGuid = new Guid("ab2bd817-98cd-4cf3-a80a-53ea0cd9c200");
 
-            // Assert
-            Assert.IsType<ShoppingItem>(okResult.Value);
-            Assert.Equal(testGuid, (okResult.Value as ShoppingItem).Id);
-        }
-        #endregion
+        //    // Act
+        //    var okResult = _controller.Get(testGuid);
 
-        #region Testing the Add Method
-        [Fact]
-        public void Add_InvalidObjectPassed_ReturnsBadRequest()
-        {
-            // Arrange
-            var nameMissingItem = new ShoppingItem()
-            {
-                Manufacturer = "Guinness",
-                Price = 12.00M
-            };
-            _controller.ModelState.AddModelError("Name", "Required");
+        //    // Assert
+        //    Assert.IsType<OkObjectResult>(okResult as OkObjectResult);
+        //}
 
-            // Act
-            var badResponse = _controller.Post(nameMissingItem);
+        //[Fact]
+        //public void GetById_ExistingGuidPassed_ReturnsRightItem()
+        //{
+        //    // Arrange
+        //    var testGuid = new Guid("ab2bd817-98cd-4cf3-a80a-53ea0cd9c200");
 
-            // Assert
-            Assert.IsType<BadRequestObjectResult>(badResponse);
-        }
+        //    // Act
+        //    var okResult = _controller.Get(testGuid) as OkObjectResult;
 
-        [Fact]
-        public void Add_ValidObjectPassed_ReturnsCreatedResponse()
-        {
-            // Arrange
-            ShoppingItem testItem = new ShoppingItem()
-            {
-                Name = "Guinness Original 6 Pack",
-                Manufacturer = "Guinness",
-                Price = 12.00M
-            };
+        //    // Assert
+        //    Assert.IsType<ShoppingItem>(okResult.Value);
+        //    Assert.Equal(testGuid, (okResult.Value as ShoppingItem).Id);
+        //}
+        //#endregion
 
-            // Act
-            var createdResponse = _controller.Post(testItem);
+        //#region Testing the Add Method
+        //[Fact]
+        //public void Add_InvalidObjectPassed_ReturnsBadRequest()
+        //{
+        //    // Arrange
+        //    var nameMissingItem = new ShoppingItem()
+        //    {
+        //        Manufacturer = "Guinness",
+        //        Price = 12.00M
+        //    };
+        //    _controller.ModelState.AddModelError("Name", "Required");
 
-            // Assert
-            Assert.IsType<CreatedAtActionResult>(createdResponse);
-        }
+        //    // Act
+        //    var badResponse = _controller.Post(nameMissingItem);
 
-        [Fact]
-        public void Add_ValidObjectPassed_ReturnedResponseHasCreatedItem()
-        {
-            // Arrange
-            var testItem = new ShoppingItem()
-            {
-                Name = "Guinness Original 6 Pack",
-                Manufacturer = "Guinness",
-                Price = 12.00M
-            };
+        //    // Assert
+        //    Assert.IsType<BadRequestObjectResult>(badResponse);
+        //}
 
-            // Act
-            var createdResponse = _controller.Post(testItem) as CreatedAtActionResult;
-            var item = createdResponse.Value as ShoppingItem;
+        //[Fact]
+        //public void Add_ValidObjectPassed_ReturnsCreatedResponse()
+        //{
+        //    // Arrange
+        //    ShoppingItem testItem = new ShoppingItem()
+        //    {
+        //        Name = "Guinness Original 6 Pack",
+        //        Manufacturer = "Guinness",
+        //        Price = 12.00M
+        //    };
 
-            // Assert
-            Assert.IsType<ShoppingItem>(item);
-            Assert.Equal("Guinness Original 6 Pack", item.Name);
-        }
-        #endregion
+        //    // Act
+        //    var createdResponse = _controller.Post(testItem);
 
-        #region Testing the Remove method
-        [Fact]
-        public void Remove_NotExistingGuidPassed_ReturnsNotFoundResponse()
-        {
-            // Arrange
-            var notExistingGuid = Guid.NewGuid();
+        //    // Assert
+        //    Assert.IsType<CreatedAtActionResult>(createdResponse);
+        //}
 
-            // Act
-            var badResponse = _controller.Remove(notExistingGuid);
+        //[Fact]
+        //public void Add_ValidObjectPassed_ReturnedResponseHasCreatedItem()
+        //{
+        //    // Arrange
+        //    var testItem = new ShoppingItem()
+        //    {
+        //        Name = "Guinness Original 6 Pack",
+        //        Manufacturer = "Guinness",
+        //        Price = 12.00M
+        //    };
 
-            // Assert
-            Assert.IsType<NotFoundResult>(badResponse);
-        }
+        //    // Act
+        //    var createdResponse = _controller.Post(testItem) as CreatedAtActionResult;
+        //    var item = createdResponse.Value as ShoppingItem;
 
-        [Fact]
-        public void Remove_ExistingGuidPassed_ReturnsNoContentResult()
-        {
-            // Arrange
-            var existingGuid = new Guid("ab2bd817-98cd-4cf3-a80a-53ea0cd9c200");
+        //    // Assert
+        //    Assert.IsType<ShoppingItem>(item);
+        //    Assert.Equal("Guinness Original 6 Pack", item.Name);
+        //}
+        //#endregion
 
-            // Act
-            var noContentResponse = _controller.Remove(existingGuid);
+        //#region Testing the Remove method
+        //[Fact]
+        //public void Remove_NotExistingGuidPassed_ReturnsNotFoundResponse()
+        //{
+        //    // Arrange
+        //    var notExistingGuid = Guid.NewGuid();
 
-            // Assert
-            Assert.IsType<NoContentResult>(noContentResponse);
-        }
+        //    // Act
+        //    var badResponse = _controller.Remove(notExistingGuid);
 
-        [Fact]
-        public void Remove_ExistingGuidPassed_RemovesOneItem()
-        {
-            // Arrange
-            var existingGuid = new Guid("ab2bd817-98cd-4cf3-a80a-53ea0cd9c200");
+        //    // Assert
+        //    Assert.IsType<NotFoundResult>(badResponse);
+        //}
 
-            // Act
-            var okResponse = _controller.Remove(existingGuid);
+        //[Fact]
+        //public void Remove_ExistingGuidPassed_ReturnsNoContentResult()
+        //{
+        //    // Arrange
+        //    var existingGuid = new Guid("ab2bd817-98cd-4cf3-a80a-53ea0cd9c200");
 
-            // Assert
-            Assert.Equal(2, _service.GetAllItems().Count());
-        }
-        #endregion
+        //    // Act
+        //    var noContentResponse = _controller.Remove(existingGuid);
+
+        //    // Assert
+        //    Assert.IsType<NoContentResult>(noContentResponse);
+        //}
+
+        //[Fact]
+        //public void Remove_ExistingGuidPassed_RemovesOneItem()
+        //{
+        //    // Arrange
+        //    var existingGuid = new Guid("ab2bd817-98cd-4cf3-a80a-53ea0cd9c200");
+
+        //    // Act
+        //    var okResponse = _controller.Remove(existingGuid);
+
+        //    // Assert
+        //    Assert.Equal(2, _service.GetAllItems().Count());
+        //}
+        //#endregion
     }
 }
